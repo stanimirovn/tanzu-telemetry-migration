@@ -1,0 +1,299 @@
+---
+title: Configuration Reference
+owner: Telemetry
+---
+
+This topic lists the parameters that are used to collect and send data with 
+Tanzu Telemetry Collector.
+
+<p class="note"><strong>Note:</strong>
+If you have an HTTP proxy server on your network you must set <code>https_proxy</code> with the hostname or IP address of the proxy server.
+</p>
+
+## <a id="collect"></a>Collect
+
+To collect data with Tanzu Telemetry Collector you configure the following 
+parameters:
+
+<table class="nice">
+    <th>Flag</th>
+    <th>Environment Variable</th>
+    <th>Description</th>
+    <tr>
+      <td><code>output-dir</code></td>
+      <td>
+        <code>$OUTPUT_DIR</code>
+      </td><td>
+        <ul>
+          <li>string</li>
+          <li>Local directory where the command writes the output <code>tar</code> 
+          file</li></ul></td>
+    </tr>
+    <tr>
+      <td><code>url</code></td>
+      <td>
+        <code>$OPS_MANAGER_URL</code>
+      </td><td>
+        <ul>
+          <li>string</li>
+          <li>Ops Manager URL where the command collects data from.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>username</code></td>
+      <td>
+        <code>$OPS_MANAGER_USERNAME</code>
+      </td><td>
+        <ul>
+          <li>string</li>
+          <li>Ops Manager username</li>
+          <li>Not required if you are using client authentication</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>password</code></td>
+      <td>
+        <code>$OPS_MANAGER_PASSWORD</code>
+      </td><td>
+        <ul>
+          <li>string</li>
+          <li>Ops Manager password</li>
+          <li>Not required if you are using client authentication</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>client-id</code></td>
+      <td>
+        <code>$OPS_MANAGER_CLIENT_ID</code>
+      </td><td>
+        <ul>
+          <li>string</li>
+          <li>Ops Manager client ID</li>
+          <li>Client needs to be a member of the <code>opsman.restricted_view</code> group or higher</li>
+          <li>Not required if you are using the <code>username</code> and 
+          <code>password</code> parameters for authentication</li>
+        </ul>
+      </td>
+    </tr>    
+    <tr >
+      <td><code>client-secret</code></td>
+        <td>
+          <code>$OPS_MANAGER_CLIENT_SECRET</code>
+        </td><td>
+          <ul>
+            <li>string</li>
+            <li>Ops Manager client secret</li>
+            <li>Not required if you are using the <code>username</code> and 
+            <code>password</code> for authentication</li>
+          </ul>
+        </td>
+    </tr>    
+    <tr>
+      <td><code>env-type</code></td>
+      <td>
+        <code>$ENV_TYPE</code>
+      </td><td>
+        <ul>
+          <li>string</li>
+          <li>The type of environment you are using to collect data</li>
+          <li>You can enter one the following options:
+            <ul>
+              <li>sandbox</li>
+              <li>development</li>
+              <li>qa</li> 
+              <li>pre-production</li> 
+              <li>production</li>
+            </ul>
+          </li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>foundation-nickname</code></td>
+      <td>
+        <code>$FOUNDATION_NICKNAME</code>
+      </td><td>
+        <ul>
+          <li>string</li>
+          <li>Specify foundation nickname used in reporting by VMware</li>
+        </ul>
+      </td>
+    </tr>    
+    <tr>
+      <td><code>insecure-skip-tls-verify</code></td>
+      <td>(none)</td>
+      <td>
+        <ul>
+        <li>Skips TLS validation on HTTP requests to Ops Manager</li>
+        </ul>
+      </td>
+    </tr>    
+    <tr>
+      <td><code>ops-manager-timeout</code></td>
+      <td>
+        <code>$OPS_MANAGER_TIMEOUT</code>
+      </td>
+      <td>
+        <ul>
+          <li>integer</li>
+          <li>Timeout in seconds for establishing an Ops Manager connection</li>
+          <li>Defaults to 30 seconds</li>
+          <li>Optional</li>
+          </ul></td>
+    </tr>
+    <tr>
+      <td><code>ops-manager-request-timeout</code></td>
+      <td>
+        <code>$OPS_MANAGER_REQUEST_TIMEOUT</code>
+      </td>
+      <td>
+        <ul>
+          <li>integer</li>
+          <li>Timeout in seconds to wait for OpsManager to fulfill a request</li>
+          <li>Defaults to 30 seconds</li>
+          <li>Optional</li>
+          </ul></td>
+    </tr>
+    <tr>
+      <td><code>with-credhub-info</code></td>
+      <td>
+        <code>$WITH_CREDHUB_INFO</code>
+      </td>
+      <td>
+        <ul>
+          <li>Optional</li>
+          <li>When present, this will allow the Telemetry Collector to pull additional certificate information from Credhub so that VMware can help flag soon-to-expire certificates</li>
+          <li>Requires network access to the Credhub VM which is co-located on the BOSH Director VM</li>
+          </ul></td>
+    </tr>
+    <tr>
+      <td><code>cf-api-url</code></td>
+      <td>
+        <code>$CF_API_URL</code>
+      </td>
+      <td>
+        <ul>
+          <li>string</li>
+          <li>Required if usage data collection is desired</li>
+          <li>Used to retrieve the foundation's UAA URL, which is required to collect Usage Service data</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>usage-service-url</code></td>
+      <td>
+        <code>$USAGE_SERVICE_URL</code>
+      </td>
+      <td>
+        <ul>
+          <li>string</li>
+          <li>Required for usage data collection</li>
+          <li>Usage Service URL where the command collects usage data from</li>
+          <li>Example: <code>https://app-usage.YOUR-SYSTEM-DOMAIN</code></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>usage-service-client-id</code></td>
+      <td>
+        <code>$USAGE_SERVICE_CLIENT_ID</code>
+      </td>
+      <td>
+        <ul>
+          <li>string</li>
+          <li>Usage Service client ID</li>
+          <li>Required for usage data collection</li>
+          <li>Client needs to be a member of either the <code>cloud_controller.admin</code> or <code>usage_service.audit</code> group</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>usage-service-client-secret</code></td>
+      <td>
+        <code>$USAGE_SERVICE_CLIENT_SECRET</code>
+      </td>
+      <td>
+        <ul>
+          <li>string</li>
+          <li>Usage Service client secret</li>
+          <li>Required for usage data collection</li>
+          <li>Client needs to be a member of either the <code>cloud_controller.admin</code> or <code>usage_service.audit</code> group</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>usage-service-insecure-skip-tls-verify</code></td>
+      <td>
+        <code>$USAGE_SERVICE_INSECURE_SKIP_TLS_VERIFY</code>
+      </td>
+      <td>
+        <ul>
+          <li>Required for usage data collection</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>usage-service-timeout</code></td>
+      <td>
+        <code>$USAGE_SERVICE_TIMEOUT</code>
+      </td>
+      <td>
+        <ul>
+          <li>integer</li>
+          <li>Timeout on request connection and fulfillment to Usage Service in seconds</li>
+          <li>Defaults to 30 seconds</li>
+          <li>Optional</li>
+          </ul></td>
+    </tr>
+    <tr>
+      <td><code>config</code></td>
+      <td>
+        <code>$CONFIG_FILE</code>
+      </td>
+      <td>
+        <ul>
+          <li>Config file for all other command line arguments</li>
+          <li>Requires a file extension e.g. '.yml' or '.json'</li>
+        </ul>
+      </td>
+    </tr>
+</table>
+
+## <a id="send"></a>Send
+
+To send data with Tanzu Telemetry Collector you configure the following 
+parameters:
+
+<table class="nice">
+
+<th>Flag</th>
+<th>Environment Variable</th>
+<th>Description</th>
+
+<tr>
+<td><code>path</code></td>
+<td>(none)</td>
+<td>
+  <ul>
+    <li>string</li>
+    <li>Path to the <code>FoundationDetails_#######.tar</code> file written by the 
+    <code>collect</code> command</li></ul>
+</td>
+</tr>
+
+<tr>
+  <td><code>api-key</code></td>
+  <td><code>$API_KEY</code></td>
+  <td>
+    <ul>
+      <li>string</li>
+      <li>Key used to authenticate with the Tanzu Telemetry API</li>
+      <li>Provided to customers by VMware</li>
+    </ul>
+  </td>
+</tr>
+
+</table>

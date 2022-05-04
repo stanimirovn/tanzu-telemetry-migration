@@ -1,0 +1,334 @@
+---
+title: Data Security
+owner: Telemetry
+---
+
+This topic describes how Tanzu Telemetry Collector transmits, stores, and 
+secures collected data.
+
+## <a id="overview"></a>Overview
+
+Tanzu Telemetry Collector collects configuration data
+about your foundation. Tanzu Telemetry Collector 
+does not collect any personal data or
+information related to an identified or identifiable natural person. 
+For example, it does not collect data on
+passwords, private keys, or other authentication-type tools. 
+
+<p class="note"><strong>Note:</strong> Tanzu Telemetry Collector
+collects configuration data for all services installed on a
+foundation. This may include partner tile data.</p>
+
+## <a id="security"></a>Security Measures
+
+Tanzu Telemetry Collector connects to Ops Manager and optionally the <a href="https://docs.pivotal.io/application-service/2-10/operating/accounting-report.html">Usage Service</a> on any VMware Tanzu Cloud Foundry
+(PCF) foundation that has provided valid credentials. After Tanzu Telemetry 
+Collector collects data, this data may be transmitted to VMware. The data is stored 
+securely in Google Cloud Platform (GCP).
+
+Tanzu Telemetry Collector secures data during transmission using the following 
+measures:
+
+  - HTTPS connections when communicating
+  - User-specific credentials to authenticate HTTPS requests to VMware
+
+## <a id="collected"></a>Data Collected
+
+Tanzu Telemetry Collector collects data in a `FoundationDetails_######.tar` 
+file on your local filesystem. The `FoundationDetails_######.tar` contains the 
+following data:
+
+##### From Ops Manager #####
+<table class "nice">
+  <tr>
+    <th><strong>API Endpoint</th>
+    <th>Data Collected</th>
+  </tr>
+
+  <tr>
+    <td><code>/api/v0/diagnostic_report</code></td>
+    <td>
+      <ul>
+        <li>Ops Manager version</li>
+        <li>BOSH stemcell</li>
+        <li>IaaS type</li>
+        <li>Deployed and staged products, versions, and stemcells</li>
+        <li>BOSH director configuration details</li>
+        <li>BOSH releases</li>
+        <li>NTP servers is filtered out</li>
+        <li><a href="https://docs.pivotal.io/platform/2-10/opsman-api/#tag/Diagnostic-Report">
+        Documentation</a>
+        </li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <td><code>/api/v0/staged/products/:product_guid/properties</code></td>
+    <td>
+      <ul>
+        <li>Custom configurations for every installed product</li>
+        <li><a href="https://docs.pivotal.io/platform/2-10/opsman-api/#tag/Properties/paths/~1api~1v0~1staged~1products~1{product_guid}~1properties/get">
+        Documentation</a></li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <td><code>/api/v0/staged/products/:product_guid/resources</code></td>
+  <td>
+    <ul>
+      <li>Resources</li>
+      <li>List of the compute and disk configurations for all jobs on the 
+      installed products</li>
+      <li><a href="https://docs.pivotal.io/platform/2-10/opsman-api/#tag/Job-Resource-Configuration/paths/~1api~1v0~1staged~1products~1{product_guid}~1resources/get">
+      Documentation</a></li>
+    </ul>
+  </tr>
+
+  <tr>
+    <td><code>/api/v0/vm_types</code></td>
+    <td>
+      <ul>
+        <li>Details about VMs used on your IaaS, including:
+            <ul>
+              <li>Name</li>
+              <li>RAM</li>
+              <li>CPU</li>
+              <li>Ephemeral disk</li>
+              <li>Built in (true/false)</li>
+            </ul>
+          </li>
+        <li><a href="https://docs.pivotal.io/platform/2-10/opsman-api/#tag/VM-types/paths/~1api~1v0~1vm_types/get">
+        Documentation</a></li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <td><code>/api/v0/deployed/products</code></td>
+    <td>
+      <ul>
+        <li>List of all deployed tiles, including:
+        <ul>
+          <li>Name</li>
+          <li>Version</li>
+          <li>Product guid</li>
+        </ul>
+        </li>
+        <li><a href="https://docs.pivotal.io/platform/2-10/opsman-api/#tag/Products/paths/~1api~1v0~1deployed~1products/get">
+        Documentation</a></li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <td><code>/api/v0/installations</code></td>
+    <td>
+      <ul>
+        <li>Event history for tile changes, including:
+        <ul>
+          <li>Change type (e.g. - “upgrade”)</li>
+          <li>Start time</li>
+          <li>End time</li>
+          <li>Change status</li>
+        </ul>
+        </li>
+        <li> Username is filtered out</li>
+        <li><a href="https://docs.pivotal.io/platform/2-10/opsman-api/#tag/Apply-Changes/paths/~1api~1v0~1installations/get">
+        Documentation</a></li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <td><code>/api/v0/deployed/certificates</code></td>
+    <td>
+      <ul>
+        <li>Details about deployed certificates:
+        <ul>
+          <li>Issuer</li>
+          <li>Valid start and end dates</li>
+          <li>Configurable</li>
+          <li>Property reference</li>
+          <li>Property type</li>
+          <li>Property id</li>
+        </ul>
+        </li>
+        <li><a href="https://docs.pivotal.io/platform/2-10/opsman-api/#tag/Certificates/paths/~1api~1v0~1deployed~1certificates/get">
+        Documentation</a></li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <td><code>/api/v0/certificate_authorities</code></td>
+    <td>
+      <ul>
+        <li>Details about certificate authorities:
+        <ul>
+          <li>Id</li>
+          <li>Issuer</li>
+          <li>Created and expired dates</li>
+          <li>Active status</li>
+        </ul>
+        </li>
+        <li> Cert_pem and Nats_cert_pem are filtered out</li>
+        <li><a href="https://docs.pivotal.io/platform/2-10/opsman-api/#tag/Certificate-Authorities/paths/~1api~1v0~1certificate_authorities/get">
+        Documentation</a></li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <td><code>/api/v0/staged/pending_changes</code></td>
+    <td>
+      <ul>
+        <li>List of all pending changes, including:
+        <ul>
+          <li>Product GUID</li>
+          <li>Product Action</li>
+          <li>Last Deployed State</li>
+          <li>Product Errands</li>
+          <li>Product Stemcells</li>
+        </ul>
+        </li>
+        <li><a href="https://docs.pivotal.io/platform/2-10/opsman-api/#tag/Apply-Changes/paths/~1api~1v0~1staged~1pending_changes/get">
+        Documentation</a></li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+
+##### From the Usage Service #####
+The Telemetry Collector can be optionally configured to collect information about application instances, tasks, and service instances from the Usage Service.
+
+<table class "nice">
+  <tr>
+    <th><strong>API Endpoint</th>
+    <th>Data Collected</th>
+  </tr>
+
+  <tr>
+      <td><code>/system_report/app_usages</code></td>
+      <td>
+        <ul>
+          <li>System-wide app usage data:
+           <ul>
+              <li>App instance hours</li>
+              <li>Average app instances</li>
+              <li>Maximum app instances</li>
+              <li><a href="https://docs.pivotal.io/application-service/2-10/operating/accounting-report.html#app-usage">
+               Documentation</a>
+           </ul>
+          </li>
+        </ul>
+      </td>
+  </tr>
+
+  <tr>
+     <td><code>/system_report/task_usages</code></td>
+     <td>
+       <ul>
+         <li>System-wide task usage data:
+            <ul>
+               <li>Total task runs</li>
+               <li>Maximum concurrent tasks</li>
+               <li>Task hours</li>
+               <li><a href="https://docs.pivotal.io/application-service/2-10/operating/accounting-report.html#task-usage">
+               Documentation</a>
+            </ul>
+         </li>
+       </ul>
+     </td>
+   </tr>
+
+   <tr>
+      <td><code>/system_report/service_usages</code></td>
+      <td>
+         <ul>
+           <li>System-wide service usage data:
+             <ul>
+               <li>Service name</li>
+               <li>Service GUID</li>
+               <li>Duration in hours</li>
+               <li>Average service instances</li>
+               <li>Maximum service instances</li>
+               <li>Service plan usage:
+                 <ul>
+                    <li>Service plan GUID</li>
+                    <li>Service plan duration in hours</li>
+                    <li>Service plan average service instances</li>
+                    <li>Service plan maximum service instances</li>
+                    <li>Service plan name is filtered out</li>
+                  </ul>
+               </li>
+               <li><a href="https://docs.pivotal.io/application-service/2-10/operating/accounting-report.html#service-usage">
+               Documentation</a>
+             </ul>
+           </li>
+         </ul>
+       </td>
+     </tr>
+
+</table>
+
+## <a id="from-credHub"></a>From CredHub
+
+The Telemetry Collector can be optionally configured to collect certificate data from Credhub so that VMware may help a customer better flag any soon-to-expire certificates. If configured to collect from Credhub, it will get the **Name**, **Issuer**, and **Valid Date** for each certificate.
+
+
+## <a id="metadata"></a>Metadata
+
+<table class "nice">
+  <tr>
+    <th>Data</th>
+    <th>Description</th>
+  </tr>
+
+  <tr>
+    <td>Environment type</td>
+    <td>
+      <ul>
+        <li>The environment used when collecting data with the CLI (production, pre-production, QA, development, sandbox); this is input by the CLI user</li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <td>List of files collected</td>
+    <td>
+      <ul>
+        <li>The list of the files created by the collect command</li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <td>Data collection timestamp</td>
+    <td>
+      <ul>
+        <li>The date at which the data was collected</li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <td>Foundation ID</td>
+    <td>
+      <ul>
+        <li>The product GUID of the BOSH Director</li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <td>Collector tool version</td>
+    <td>
+      <ul>
+        <li>The version of Tanzu Telemetry Collector used to collect data</li>
+      </ul>
+    </td>
+  </tr>
+</table>
